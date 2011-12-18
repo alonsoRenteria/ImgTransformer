@@ -26,7 +26,7 @@
           $height;
           $type;
           
-          if(!list($w, $h) = getimagesize($path)) 
+          if(!list($width, $height) = getimagesize($path)) 
             return false;
           //capture extention
           $type = strtolower(substr(strrchr($path,"."),1));
@@ -46,7 +46,7 @@
                 break;
             default : return false;
           }  
-          return $img;
+          return array("img"=>$img,"width"=>$width, "height"=>$height);
         }
         
         /**
@@ -67,10 +67,14 @@
          * @param $path is the string of the file path
          */
         function resizeAll ($path) {
+           $porcentaje = 0.2;
            $img = $this->__loadImage ($path);
-           if ($img) {
-                
-           }
+           $nuevo_ancho = $img['width'] * $porcentaje;
+           $nuevo_alto = $img['height'] * $porcentaje;
+           $imagen_p = imagecreatetruecolor($nuevo_ancho, $nuevo_alto);
+           imagecopyresampled($imagen_p, $img['img'], 0, 0, 0, 0, $nuevo_ancho, $nuevo_alto,  $img['width'], $img['height']);
+           header('Content-Type: image/jpeg');
+           imagejpeg($imagen_p, null, 100);
         }
         
         /**
