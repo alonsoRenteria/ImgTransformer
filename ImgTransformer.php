@@ -57,14 +57,12 @@ class ImgTransformer {
 	 * @param $path is the string file path
 	 */
 	function resizeToFormat($dimensions, $path) {
-
 		$img = $this -> __loadImage($path);
 		if ($img) {
 			header("image/jpg");
 			echo $img;			
 			imagedestroy($img);
 		}
-
 	}
 
 	/**
@@ -82,11 +80,11 @@ class ImgTransformer {
 	function resizeByWidth($path, $width) {
 		//obtiene  la imagen e inserta la firma.
 		$img = $this -> insertSignature($path);
-		//calcula la altura de resize
-		$height = $img["height"] / $img["width"] * $width;
-		$imageResized = imagecreatetruecolor($width, $height);
-		imagecopyresampled($imageResized, $img["img"], 0, 0, 0, 0, $width, $height, $img["width"], $img["height"]);
-		if ($img) {			
+		if ($img) {
+			//calcula la altura de resize
+			$height = $img["height"] / $img["width"] * $width;
+			$imageResized = imagecreatetruecolor($width, $height);
+			imagecopyresampled($imageResized, $img["img"], 0, 0, 0, 0, $width, $height, $img["width"], $img["height"]);			
 			imagedestroy($img["img"]);
 			return $imageResized;
 		}
@@ -97,11 +95,11 @@ class ImgTransformer {
 	function resizeByHeight($path, $height) {
 		//obtiene  la imagen e inserta la firma.
 		$img = $this -> insertSignature($path);
-		//calcula la altura de resize
-		$width = $img["width"] / $img["height"] * $height;
-		$imageResized = imagecreatetruecolor($width, $height);
-		imagecopyresampled($imageResized, $img["img"], 0, 0, 0, 0, $width, $height, $img["width"], $img["height"]);
 		if ($img) {			
+			//calcula la altura de resize
+			$width = $img["width"] / $img["height"] * $height;
+			$imageResized = imagecreatetruecolor($width, $height);
+			imagecopyresampled($imageResized, $img["img"], 0, 0, 0, 0, $width, $height, $img["width"], $img["height"]);			
 			imagedestroy($img["img"]);
 			return $imageResized;
 		}
@@ -112,10 +110,10 @@ class ImgTransformer {
 	function insertSignature($path) {
 		$img = $this -> __loadImage($path);
 		$signature = $this -> __loadImage('input/signature.png');
-		imagecopymerge($img["img"], $signature["img"], $img["width"] - 
-			$signature["width"], $img["height"] - $signature["height"], 0, 0, $signature["width"], $signature["height"], 75);		
-		imagedestroy($signature);
-		if ($img) {			
+		if ($img && $signature) {
+			imagecopymerge($img["img"], $signature["img"], $img["width"] - 
+				$signature["width"], $img["height"] - $signature["height"], 0, 0, $signature["width"], $signature["height"], 75);		
+			imagedestroy($signature["img"]);			
 			return $img;
 		}
 		return false;
@@ -127,10 +125,15 @@ class ImgTransformer {
 	 * @param $dimensions
 	 * @param $image
 	 */
-	function cropImage($dimensions, $path) {
-		$img = $this -> __loadImage($path);
-		if ($img) {
+	function cropImage($cropArea, $path) {
+		$img = $this -> __loadImage($path);		
+		$cropImg = imagecreatetruecolor($cropArea["width"], $cropArea["height"]);
+		if ($img) {			
+			imagecopy($cropImg, $img["img"], 0, 0, $cropArea["x"], $cropArea["y"], $img["width"], $img["height"]);		
+			imagedestroy($img["img"]);
+			return $cropImg;
 		}
+		return FALSE;
 	}
 }
 ?>
